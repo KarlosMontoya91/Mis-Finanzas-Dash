@@ -1,0 +1,994 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Financiero - S24 Ultra</title>
+
+    <!-- Estilos Modernos (Bootstrap + Google Fonts) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Librerías JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.5.0/build/global/luxon.min.js"></script>
+
+    <style>
+        :root {
+            --bg-body: #f3f4f6;
+            --bg-card: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --radius: 24px;
+            --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+
+            /* Gradientes Inspirados en la imagen */
+            --grad-red: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
+            --grad-blue: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            --grad-purple: linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%);
+            --grad-accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+            --color-red: #ef4444;
+            --color-green: #10b981;
+            --color-blue: #3b82f6;
+            --color-purple: #8b5cf6;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Layout */
+        .sidebar {
+            background: var(--bg-card);
+            min-height: 100vh;
+            border-right: 1px solid rgba(0, 0, 0, 0.03);
+            position: fixed;
+            width: 260px;
+            z-index: 1000;
+            padding: 2rem 1.5rem;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+                padding: 1rem 0.5rem;
+                text-align: center;
+            }
+
+            .sidebar .nav-text {
+                display: none;
+            }
+
+            .sidebar .brand-text {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 80px;
+                padding: 1rem;
+            }
+        }
+
+        /* Nav Items */
+        .nav-link {
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background-color: #f9fafb;
+            color: var(--color-blue);
+        }
+
+        .nav-link.active {
+            background: var(--bg-body);
+            color: var(--color-blue);
+            box-shadow: inset 3px 0 0 var(--color-blue);
+        }
+
+        /* Cards */
+        .card-custom {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: none;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            height: 100%;
+            transition: transform 0.2s ease;
+        }
+
+        .card-custom:hover {
+            transform: translateY(-3px);
+        }
+
+        /* KPI Cards */
+        .kpi-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .kpi-title {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .kpi-number {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .kpi-trend {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .kpi-red .kpi-icon-circle {
+            background-color: #fee2e2;
+            color: #ef4444;
+        }
+
+        .kpi-blue .kpi-icon-circle {
+            background-color: #dbeafe;
+            color: #3b82f6;
+        }
+
+        .kpi-purple .kpi-icon-circle {
+            background-color: #f3e8ff;
+            color: #a855f7;
+        }
+
+        .kpi-green .kpi-icon-circle {
+            background-color: #d1fae5;
+            color: #10b981;
+        }
+
+        /* Banner Welcome */
+        .welcome-banner {
+            background: var(--grad-accent);
+            color: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .welcome-banner::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 100%;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBmaWxsPSJub25lIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4xKSI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMCIgcj0iNTAiIHN0cm9rZS13aWR0aD0iMjAiLz48L3N2Zz4=') no-repeat right top;
+            opacity: 0.5;
+        }
+
+        /* Tabla */
+        .table {
+            --bs-table-bg: transparent;
+        }
+
+        .table thead th {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 700;
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+            font-weight: 500;
+            padding: 1rem 0.5rem;
+            border-bottom: 1px solid #f3f4f6;
+            color: var(--text-primary);
+        }
+
+        /* Badges */
+        .badge-soft {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .bg-soft-red {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .bg-soft-green {
+            background: #d1fae5;
+            color: #10b981;
+        }
+
+        .bg-soft-blue {
+            background: #dbeafe;
+            color: #3b82f6;
+        }
+
+        .bg-soft-gray {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        /* Loader */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            transition: opacity 0.5s;
+        }
+
+        /* Botones y Controles */
+        .btn-primary-soft {
+            background-color: var(--text-primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-weight: 600;
+        }
+
+        .btn-primary-soft:hover {
+            background-color: #374151;
+            color: white;
+        }
+
+        .form-select-custom {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 8px 36px 8px 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            background-color: white;
+            cursor: pointer;
+        }
+
+        /* Vistas */
+        .view-section {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Paginación */
+        .pagination-btn {
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loading-overlay">
+        <div class="text-center">
+            <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+            <div class="text-muted fw-bold">Cargando Finanzas...</div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="d-flex align-items-center gap-3 mb-5">
+            <div class="bg-primary rounded-3 p-2 d-flex align-items-center justify-content-center"
+                style="background: var(--grad-accent) !important;">
+                <i class="bi bi-wallet2 text-white fs-5"></i>
+            </div>
+            <span class="brand-text fw-bold fs-4 text-dark">Finanzas</span>
+        </div>
+
+        <div class="nav flex-column">
+            <a class="nav-link active" onclick="switchView('dashboard', this)">
+                <i class="bi bi-grid"></i>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a class="nav-link" onclick="switchView('history', this)">
+                <i class="bi bi-clock-history"></i>
+                <span class="nav-text">Historial</span>
+            </a>
+            <a class="nav-link" onclick="switchView('analytics', this)">
+                <i class="bi bi-graph-up"></i>
+                <span class="nav-text">Analítica Avanzada</span>
+            </a>
+            <div class="mt-4 pt-4 border-top">
+                <a class="nav-link text-secondary" onclick="loadData()">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span class="nav-text">Sincronizar</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-auto pt-5">
+            <div class="p-3 rounded-4" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-green rounded-circle p-1" style="background: #10b981;"> </span>
+                    <small class="fw-bold text-dark">Conexión Segura</small>
+                </div>
+                <small class="text-secondary" style="font-size: 0.7rem;">API Notion v1.0</small>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+        <!-- Header Global -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div>
+                <h4 class="fw-bold mb-1 text-dark" id="header-greeting">Hola, Karlos 👋</h4>
+                <p class="text-secondary small mb-0">Gestión inteligente de tus finanzas.</p>
+            </div>
+
+            <div class="d-flex gap-3 align-items-center bg-white p-2 rounded-4 shadow-sm">
+                <i class="bi bi-calendar4 text-secondary ms-2"></i>
+                <select id="time-range" class="form-select-custom border-0 py-1">
+                    <option value="today">Hoy</option>
+                    <option value="week">Esta Semana</option>
+                    <option value="month" selected>Este Mes</option>
+                    <option value="year">Este Año</option>
+                    <option value="all">Todo el Historial</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- VISTA DASHBOARD (HOME) -->
+        <div id="view-dashboard" class="view-section">
+
+            <!-- Banner Resumen -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="welcome-banner d-flex align-items-center justify-content-between">
+                        <div>
+                            <h2 class="fw-bold mb-1">Balance del Periodo</h2>
+                            <p class="mb-0 opacity-75">Ingresos vs Gastos registrados</p>
+                        </div>
+                        <div class="text-end">
+                            <h1 class="fw-bold mb-0" id="kpi-balance">$0.00</h1>
+                            <span class="badge bg-white text-primary bg-opacity-25" id="balance-badge">Neutro</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPIs Cards -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="card-custom kpi-card kpi-red">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="kpi-title">Gastos Totales</div>
+                                <div class="kpi-number" id="kpi-expense">$0</div>
+                            </div>
+                            <div class="kpi-icon-circle"><i class="bi bi-bag"></i></div>
+                        </div>
+                        <div class="kpi-trend text-danger">
+                            <i class="bi bi-arrow-up-right"></i>
+                            <span id="trend-expense">Calculando...</span>
+                            <span class="text-secondary fw-normal ms-1">vs periodo anterior</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card-custom kpi-card kpi-green">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="kpi-title">Ingresos</div>
+                                <div class="kpi-number" id="kpi-income">$0</div>
+                            </div>
+                            <div class="kpi-icon-circle"><i class="bi bi-currency-dollar"></i></div>
+                        </div>
+                        <div class="kpi-trend text-success">
+                            <i class="bi bi-arrow-up-right"></i>
+                            <span id="trend-income">Calculando...</span>
+                            <span class="text-secondary fw-normal ms-1">vs periodo anterior</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card-custom kpi-card kpi-blue">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="kpi-title">Movimientos</div>
+                                <div class="kpi-number" id="kpi-count">0</div>
+                            </div>
+                            <div class="kpi-icon-circle"><i class="bi bi-receipt"></i></div>
+                        </div>
+                        <div class="kpi-trend text-primary">
+                            <i class="bi bi-activity"></i>
+                            <span class="text-secondary fw-normal ms-1">En este periodo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                    <div class="card-custom">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-bold mb-0">Gastos por Categoría</h5>
+                        </div>
+                        <div style="height: 300px;">
+                            <canvas id="chart-categories"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card-custom">
+                        <h5 class="fw-bold mb-4">Top Cuentas</h5>
+                        <div id="account-list" class="d-flex flex-column gap-3">
+                            <div class="text-center text-muted py-5">Cargando datos...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-custom">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold mb-0">Últimas Transacciones (Top 8)</h5>
+                    <button class="btn btn-sm btn-light text-primary"
+                        onclick="switchView('history', document.querySelectorAll('.nav-link')[1])">Ver Todas</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tx-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Concepto</th>
+                                <th>Categoría</th>
+                                <th>Método</th>
+                                <th class="text-end">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- JS Inject --></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA HISTORIAL (NUEVA) -->
+        <div id="view-history" class="view-section d-none">
+            <div class="card-custom">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <h5 class="fw-bold mb-0">Registro Completo de Movimientos</h5>
+                    <div class="badge bg-light text-secondary border">Mostrando <span id="history-showing">0</span>
+                        registros</div>
+                </div>
+
+                <div class="table-responsive mb-3">
+                    <table class="table table-hover align-middle" id="history-table">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Referencia / Concepto</th>
+                                <th>Categoría (Auto)</th>
+                                <th>Cuenta</th>
+                                <th>Tipo</th>
+                                <th class="text-end">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody">
+                            <!-- JS Injected -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer Paginación -->
+                <div class="d-flex justify-content-between align-items-center border-top pt-3 flex-wrap gap-3">
+                    <span class="text-secondary small" id="page-info">Página 1 de 1</span>
+                    <div class="d-flex gap-2">
+                        <button class="pagination-btn" id="btn-prev" onclick="changePage(-1)" disabled>
+                            <i class="bi bi-chevron-left"></i> Anterior
+                        </button>
+                        <button class="pagination-btn" id="btn-next" onclick="changePage(1)" disabled>
+                            Siguiente <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA ANALÍTICA AVANZADA -->
+        <div id="view-analytics" class="view-section d-none">
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="card-custom bg-dark text-white"
+                        style="background: linear-gradient(135deg, #1f2937 0%, #111827 100%);">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="bg-white bg-opacity-10 p-2 rounded-circle">
+                                <i class="bi bi-graph-up-arrow text-warning"></i>
+                            </div>
+                            <h6 class="mb-0 opacity-75">Proyección Fin de Mes</h6>
+                        </div>
+                        <h2 class="fw-bold mb-1" id="projection-amount">$0.00</h2>
+                        <p class="small opacity-50 mb-0">Estimado basado en tu promedio diario.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card-custom">
+                        <h6 class="text-secondary text-uppercase small fw-bold mb-2">Promedio Diario (Gasto)</h6>
+                        <h2 class="fw-bold text-dark mb-1" id="avg-daily">$0.00</h2>
+                        <div class="progress mt-3" style="height: 6px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 70%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="card-custom">
+                        <h5 class="fw-bold mb-4">Análisis por Método de Pago</h5>
+                        <div style="height: 300px;">
+                            <canvas id="chart-accounts"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURACIÓN
+        // ==========================================
+        const API_URL = "https://purple-mud-12f8.karlosmontoya091.workers.dev/";
+
+        const categoryRules = [
+            { cat: "Comida", keys: ["tacos", "pizza", "burger", "restaurante", "sushi", "rappi", "uber eats", "alitas", "cena", "desayuno", "comida"] },
+            { cat: "Café", keys: ["starbucks", "cafe", "café", "andatti", "caffenio", "tim hortons", "dunkin"] },
+            { cat: "Supermercado", keys: ["heb", "walmart", "soriana", "costco", "oxxo", "super", "bodega", "fresko", "tienda", "oxxo"] },
+            { cat: "Transporte", keys: ["uber", "didi", "taxi", "gasolina", "pemex", "bp", "shell", "camion", "transporte", "metro"] },
+            { cat: "Servicios", keys: ["cfe", "luz", "agua", "internet", "telcel", "att", "plan", "netflix", "spotify", "youtube", "hbo", "disney"] },
+            { cat: "Salud", keys: ["farmacia", "doctor", "dentista", "hospital", "medicina", "consulta"] },
+            { cat: "Shopping", keys: ["amazon", "mercado libre", "zara", "ropa", "shein", "temu", "nike", "adidas"] },
+            { cat: "Suscripciones", keys: ["apple", "google", "icloud"] }
+        ];
+
+        // ==========================================
+        // LÓGICA PRINCIPAL
+        // ==========================================
+        const { DateTime } = luxon;
+        let allTransactions = [];
+        let filteredGlobal = []; // Para uso en historial
+        let charts = {};
+
+        // Paginación
+        let currentPage = 1;
+        const itemsPerPage = 20;
+
+        function switchView(viewName, element) {
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            ['dashboard', 'history', 'analytics'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('d-none');
+            });
+            document.getElementById(`view-${viewName}`).classList.remove('d-none');
+
+            // Si vamos al historial, forzamos render de la tabla
+            if (viewName === 'history') {
+                renderHistoryTable();
+            }
+        }
+
+        const formatMoney = (amount) => {
+            return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
+        };
+
+        const detectCategory = (name) => {
+            const lowerName = name.toLowerCase();
+            for (const rule of categoryRules) {
+                if (rule.keys.some(key => lowerName.includes(key))) {
+                    return rule.cat;
+                }
+            }
+            return "Otros";
+        };
+
+        async function loadData() {
+            const loader = document.getElementById('loading-overlay');
+            loader.style.opacity = '1';
+            loader.style.display = 'flex';
+
+            try {
+                let data;
+                if (API_URL) {
+                    const response = await fetch(API_URL);
+                    if (!response.ok) throw new Error("Error API");
+                    data = await response.json();
+                } else {
+                    data = [];
+                }
+
+                allTransactions = data.map(tx => ({
+                    ...tx,
+                    categoriaAuto: detectCategory(tx.nombre)
+                }));
+
+                // Ordenar por fecha descendente por defecto
+                allTransactions.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+                updateDashboard();
+
+            } catch (error) {
+                console.error(error);
+                alert("Error conectando con tu Notion. Verifica la API.");
+            } finally {
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display = 'none', 500);
+                }, 800);
+            }
+        }
+
+        function calculateTrends(currentMonthTotal, previousMonthTotal, elementId) {
+            const el = document.getElementById(elementId);
+            if (previousMonthTotal === 0) {
+                el.innerText = "+100%";
+                return;
+            }
+            const diff = currentMonthTotal - previousMonthTotal;
+            const percentage = (diff / previousMonthTotal) * 100;
+            const symbol = percentage > 0 ? "+" : "";
+            el.innerText = `${symbol}${percentage.toFixed(1)}%`;
+        }
+
+        function calculateProjection(currentExpense) {
+            const now = DateTime.now();
+            const daysInMonth = now.daysInMonth;
+            const currentDay = now.day;
+            if (currentDay === 0) return 0;
+            const dailyAvg = currentExpense / currentDay;
+            const projected = dailyAvg * daysInMonth;
+            document.getElementById('avg-daily').innerText = formatMoney(dailyAvg);
+            document.getElementById('projection-amount').innerText = formatMoney(projected);
+        }
+
+        // ==========================================
+        // LÓGICA DE FILTRADO Y DASHBOARD
+        // ==========================================
+        function getFilteredTransactions() {
+            const range = document.getElementById('time-range').value;
+            const now = DateTime.now();
+
+            return allTransactions.filter(tx => {
+                const txDate = DateTime.fromISO(tx.fecha);
+                if (range === 'today') return txDate.hasSame(now, 'day');
+                if (range === 'week') return txDate.hasSame(now, 'week');
+                if (range === 'month') return txDate.hasSame(now, 'month');
+                if (range === 'year') return txDate.hasSame(now, 'year');
+                if (range === 'all') return true;
+                return true;
+            });
+        }
+
+        function updateDashboard() {
+            const filtered = getFilteredTransactions();
+            filteredGlobal = filtered; // Guardar referencia para historial
+
+            // Reiniciar paginación al cambiar filtros
+            currentPage = 1;
+
+            // --- Cálculos Dashboard ---
+            const now = DateTime.now();
+
+            // Comparativa Mes vs Mes Anterior (Independiente del filtro visual)
+            const currentMonthTxs = allTransactions.filter(tx => DateTime.fromISO(tx.fecha).hasSame(now, 'month'));
+            const prevMonthTxs = allTransactions.filter(tx => DateTime.fromISO(tx.fecha).hasSame(now.minus({ months: 1 }), 'month'));
+
+            let totalExpense = 0;
+            let totalIncome = 0;
+
+            filtered.forEach(tx => {
+                if (tx.tipo.toLowerCase().includes('ingreso')) totalIncome += tx.valor;
+                else totalExpense += tx.valor;
+            });
+
+            let curMonthExp = 0, curMonthInc = 0;
+            let prevMonthExp = 0, prevMonthInc = 0;
+
+            currentMonthTxs.forEach(t => t.tipo.toLowerCase().includes('ingreso') ? curMonthInc += t.valor : curMonthExp += t.valor);
+            prevMonthTxs.forEach(t => t.tipo.toLowerCase().includes('ingreso') ? prevMonthInc += t.valor : prevMonthExp += t.valor);
+
+            document.getElementById('kpi-expense').innerText = formatMoney(totalExpense);
+            document.getElementById('kpi-income').innerText = formatMoney(totalIncome);
+            document.getElementById('kpi-balance').innerText = formatMoney(totalIncome - totalExpense);
+            document.getElementById('kpi-count').innerText = filtered.length;
+
+            calculateTrends(curMonthExp, prevMonthExp, 'trend-expense');
+            calculateTrends(curMonthInc, prevMonthInc, 'trend-income');
+
+            // Proyecciones
+            const range = document.getElementById('time-range').value;
+            if (range === 'month') {
+                calculateProjection(totalExpense);
+            } else {
+                document.getElementById('projection-amount').innerText = "Ver vista Mensual";
+                document.getElementById('avg-daily').innerText = "—";
+            }
+
+            // Agrupaciones
+            const categoryGroups = {};
+            const accountGroups = {};
+            filtered.filter(t => !t.tipo.toLowerCase().includes('ingreso')).forEach(tx => {
+                categoryGroups[tx.categoriaAuto] = (categoryGroups[tx.categoriaAuto] || 0) + tx.valor;
+                accountGroups[tx.cuenta] = (accountGroups[tx.cuenta] || 0) + tx.valor;
+            });
+
+            renderCharts(categoryGroups, accountGroups);
+            renderTopAccounts(accountGroups);
+            renderDashboardTable(filtered); // Tabla pequeña del dashboard
+            renderHistoryTable(); // Tabla grande del historial (si está visible se actualiza)
+        }
+
+        // ==========================================
+        // RENDERIZADO
+        // ==========================================
+
+        // Tabla Dashboard (Top 8)
+        function renderDashboardTable(txs) {
+            const tbody = document.querySelector('#tx-table tbody');
+            tbody.innerHTML = '';
+            // No necesitamos ordenar de nuevo, allTransactions ya está ordenado
+            const recent = txs.slice(0, 8);
+
+            recent.forEach(tx => {
+                const isIncome = tx.tipo.toLowerCase().includes('ingreso');
+                const row = `
+                    <tr>
+                        <td class="text-secondary small">${tx.fecha}</td>
+                        <td class="fw-bold text-dark">${tx.nombre}</td>
+                        <td><span class="badge bg-light text-secondary border border-light">${tx.categoriaAuto}</span></td>
+                        <td class="small text-secondary"><i class="bi bi-credit-card me-1"></i> ${tx.cuenta}</td>
+                        <td class="text-end fw-bold ${isIncome ? 'text-success' : 'text-danger'}">
+                            ${isIncome ? '+' : '-'} ${formatMoney(tx.valor)}
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // Tabla Historial (Paginada)
+        function renderHistoryTable() {
+            const tbody = document.getElementById('history-tbody');
+            tbody.innerHTML = '';
+
+            const totalItems = filteredGlobal.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+            // Validar página actual
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            // Slice de datos
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageItems = filteredGlobal.slice(start, end);
+
+            // Render Rows
+            if (pageItems.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-muted">No hay registros en este periodo</td></tr>';
+            } else {
+                pageItems.forEach(tx => {
+                    const isIncome = tx.tipo.toLowerCase().includes('ingreso');
+                    const badgeClass = isIncome ? 'bg-soft-green' : 'bg-soft-red';
+
+                    const row = `
+                        <tr>
+                            <td class="text-secondary small" style="white-space:nowrap;">${tx.fecha}</td>
+                            <td class="fw-bold text-dark">${tx.nombre}</td>
+                            <td><span class="badge bg-light text-secondary border">${tx.categoriaAuto}</span></td>
+                            <td class="small text-secondary"><i class="bi bi-credit-card me-1"></i> ${tx.cuenta}</td>
+                             <td><span class="badge ${isIncome ? 'bg-soft-green' : 'bg-soft-red'} bg-opacity-10 text-dark border-0">${tx.tipo}</span></td>
+                            <td class="text-end fw-bold ${isIncome ? 'text-success' : 'text-danger'}">
+                                ${isIncome ? '+' : '-'} ${formatMoney(tx.valor)}
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            }
+
+            // Actualizar Controles Paginación
+            document.getElementById('history-showing').innerText = totalItems;
+            document.getElementById('page-info').innerText = `Página ${currentPage} de ${totalPages}`;
+            document.getElementById('btn-prev').disabled = currentPage === 1;
+            document.getElementById('btn-next').disabled = currentPage === totalPages;
+        }
+
+        function changePage(delta) {
+            currentPage += delta;
+            renderHistoryTable();
+            // Scroll suave al inicio de la tabla
+            document.getElementById('view-history').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function renderTopAccounts(accData) {
+            const list = document.getElementById('account-list');
+            list.innerHTML = '';
+            const sorted = Object.entries(accData).sort((a, b) => b[1] - a[1]).slice(0, 4);
+            const total = Object.values(accData).reduce((a, b) => a + b, 0);
+
+            const colors = ['bg-soft-blue', 'bg-soft-red', 'bg-soft-green', 'bg-soft-gray'];
+            const iconColors = ['text-primary', 'text-danger', 'text-success', 'text-secondary'];
+
+            if (sorted.length === 0) {
+                list.innerHTML = '<div class="text-center text-muted small">Sin gastos registrados</div>';
+                return;
+            }
+
+            sorted.forEach((item, index) => {
+                const percent = total > 0 ? Math.round((item[1] / total) * 100) : 0;
+                const colorClass = colors[index % colors.length];
+                const textClass = iconColors[index % iconColors.length];
+
+                list.innerHTML += `
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-3 p-2 ${colorClass}">
+                                <i class="bi bi-credit-card-2-front ${textClass}"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold small text-dark">${item[0]}</div>
+                                <div class="text-secondary" style="font-size: 0.7rem;">${percent}% del gasto</div>
+                            </div>
+                        </div>
+                        <div class="fw-bold text-dark small">${formatMoney(item[1])}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderCharts(catData, accData) {
+            const catCtx = document.getElementById('chart-categories').getContext('2d');
+            if (charts.cat) charts.cat.destroy();
+            const palette = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5', '#9B59B6'];
+
+            charts.cat = new Chart(catCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(catData),
+                    datasets: [{
+                        label: 'Gasto',
+                        data: Object.values(catData),
+                        backgroundColor: palette,
+                        borderRadius: 6,
+                        barThickness: 20
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { display: false } },
+                        y: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', weight: '600' } } }
+                    }
+                }
+            });
+
+            const accCtx = document.getElementById('chart-accounts').getContext('2d');
+            if (charts.acc) charts.acc.destroy();
+
+            charts.acc = new Chart(accCtx, {
+                type: 'line',
+                data: {
+                    labels: Object.keys(accData),
+                    datasets: [{
+                        label: 'Flujo por Cuenta',
+                        data: Object.values(accData),
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderColor: '#3b82f6',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#3b82f6',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { borderDash: [5, 5], color: '#f3f4f6' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        document.getElementById('time-range').addEventListener('change', updateDashboard);
+        loadData();
+
+    </script>
+
+</body>
+
+</html>
