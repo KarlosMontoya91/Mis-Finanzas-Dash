@@ -26,15 +26,9 @@
             --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
 
             /* Gradientes Inspirados en la imagen */
-            --grad-red: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
-            --grad-blue: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-            --grad-purple: linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%);
             --grad-accent: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 
-            --color-red: #ef4444;
-            --color-green: #10b981;
             --color-blue: #3b82f6;
-            --color-purple: #8b5cf6;
         }
 
         body {
@@ -67,10 +61,7 @@
                 text-align: center;
             }
 
-            .sidebar .nav-text {
-                display: none;
-            }
-
+            .sidebar .nav-text,
             .sidebar .brand-text {
                 display: none;
             }
@@ -174,17 +165,12 @@
             color: #3b82f6;
         }
 
-        .kpi-purple .kpi-icon-circle {
-            background-color: #f3e8ff;
-            color: #a855f7;
-        }
-
         .kpi-green .kpi-icon-circle {
             background-color: #d1fae5;
             color: #10b981;
         }
 
-        /* Banner Welcome */
+        /* Banner */
         .welcome-banner {
             background: var(--grad-accent);
             color: white;
@@ -229,13 +215,6 @@
         }
 
         /* Badges */
-        .badge-soft {
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.75rem;
-        }
-
         .bg-soft-red {
             background: #fee2e2;
             color: #ef4444;
@@ -256,6 +235,16 @@
             color: #4b5563;
         }
 
+        /* Badge Categoria Dinámico */
+        .badge-cat {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         /* Loader */
         #loading-overlay {
             position: fixed;
@@ -272,21 +261,7 @@
             transition: opacity 0.5s;
         }
 
-        /* Botones y Controles */
-        .btn-primary-soft {
-            background-color: var(--text-primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 8px 16px;
-            font-weight: 600;
-        }
-
-        .btn-primary-soft:hover {
-            background-color: #374151;
-            color: white;
-        }
-
+        /* Botones y Selects */
         .form-select-custom {
             border: 1px solid #e5e7eb;
             border-radius: 12px;
@@ -297,24 +272,6 @@
             cursor: pointer;
         }
 
-        /* Vistas */
-        .view-section {
-            animation: fadeIn 0.4s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Paginación */
         .pagination-btn {
             border: 1px solid #e5e7eb;
             background: white;
@@ -333,6 +290,22 @@
         .pagination-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        .view-section {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
@@ -359,21 +332,17 @@
 
         <div class="nav flex-column">
             <a class="nav-link active" onclick="switchView('dashboard', this)">
-                <i class="bi bi-grid"></i>
-                <span class="nav-text">Dashboard</span>
+                <i class="bi bi-grid"></i> <span class="nav-text">Dashboard</span>
             </a>
             <a class="nav-link" onclick="switchView('history', this)">
-                <i class="bi bi-clock-history"></i>
-                <span class="nav-text">Historial</span>
+                <i class="bi bi-clock-history"></i> <span class="nav-text">Historial</span>
             </a>
             <a class="nav-link" onclick="switchView('analytics', this)">
-                <i class="bi bi-graph-up"></i>
-                <span class="nav-text">Analítica Avanzada</span>
+                <i class="bi bi-graph-up"></i> <span class="nav-text">Analítica Avanzada</span>
             </a>
             <div class="mt-4 pt-4 border-top">
                 <a class="nav-link text-secondary" onclick="loadData()">
-                    <i class="bi bi-arrow-clockwise"></i>
-                    <span class="nav-text">Sincronizar</span>
+                    <i class="bi bi-arrow-clockwise"></i> <span class="nav-text">Sincronizar</span>
                 </a>
             </div>
         </div>
@@ -398,7 +367,6 @@
                 <h4 class="fw-bold mb-1 text-dark" id="header-greeting">Hola, Karlos 👋</h4>
                 <p class="text-secondary small mb-0">Gestión inteligente de tus finanzas.</p>
             </div>
-
             <div class="d-flex gap-3 align-items-center bg-white p-2 rounded-4 shadow-sm">
                 <i class="bi bi-calendar4 text-secondary ms-2"></i>
                 <select id="time-range" class="form-select-custom border-0 py-1">
@@ -411,10 +379,8 @@
             </div>
         </div>
 
-        <!-- VISTA DASHBOARD (HOME) -->
+        <!-- VISTA DASHBOARD -->
         <div id="view-dashboard" class="view-section">
-
-            <!-- Banner Resumen -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="welcome-banner d-flex align-items-center justify-content-between">
@@ -430,7 +396,6 @@
                 </div>
             </div>
 
-            <!-- KPIs Cards -->
             <div class="row g-4 mb-4">
                 <div class="col-md-4">
                     <div class="card-custom kpi-card kpi-red">
@@ -442,13 +407,11 @@
                             <div class="kpi-icon-circle"><i class="bi bi-bag"></i></div>
                         </div>
                         <div class="kpi-trend text-danger">
-                            <i class="bi bi-arrow-up-right"></i>
-                            <span id="trend-expense">Calculando...</span>
-                            <span class="text-secondary fw-normal ms-1">vs periodo anterior</span>
+                            <i class="bi bi-arrow-up-right"></i> <span id="trend-expense">...</span> <span
+                                class="text-secondary fw-normal ms-1">vs anterior</span>
                         </div>
                     </div>
                 </div>
-
                 <div class="col-md-4">
                     <div class="card-custom kpi-card kpi-green">
                         <div class="d-flex justify-content-between align-items-start">
@@ -459,13 +422,11 @@
                             <div class="kpi-icon-circle"><i class="bi bi-currency-dollar"></i></div>
                         </div>
                         <div class="kpi-trend text-success">
-                            <i class="bi bi-arrow-up-right"></i>
-                            <span id="trend-income">Calculando...</span>
-                            <span class="text-secondary fw-normal ms-1">vs periodo anterior</span>
+                            <i class="bi bi-arrow-up-right"></i> <span id="trend-income">...</span> <span
+                                class="text-secondary fw-normal ms-1">vs anterior</span>
                         </div>
                     </div>
                 </div>
-
                 <div class="col-md-4">
                     <div class="card-custom kpi-card kpi-blue">
                         <div class="d-flex justify-content-between align-items-start">
@@ -476,8 +437,8 @@
                             <div class="kpi-icon-circle"><i class="bi bi-receipt"></i></div>
                         </div>
                         <div class="kpi-trend text-primary">
-                            <i class="bi bi-activity"></i>
-                            <span class="text-secondary fw-normal ms-1">En este periodo</span>
+                            <i class="bi bi-activity"></i> <span class="text-secondary fw-normal ms-1">En este
+                                periodo</span>
                         </div>
                     </div>
                 </div>
@@ -486,19 +447,15 @@
             <div class="row g-4 mb-4">
                 <div class="col-lg-8">
                     <div class="card-custom">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="fw-bold mb-0">Gastos por Categoría</h5>
-                        </div>
-                        <div style="height: 300px;">
-                            <canvas id="chart-categories"></canvas>
-                        </div>
+                        <h5 class="fw-bold mb-4">Gastos por Categoría</h5>
+                        <div style="height: 300px;"><canvas id="chart-categories"></canvas></div>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="card-custom">
                         <h5 class="fw-bold mb-4">Top Cuentas</h5>
                         <div id="account-list" class="d-flex flex-column gap-3">
-                            <div class="text-center text-muted py-5">Cargando datos...</div>
+                            <div class="text-center text-muted py-5">Cargando...</div>
                         </div>
                     </div>
                 </div>
@@ -506,7 +463,7 @@
 
             <div class="card-custom">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold mb-0">Últimas Transacciones (Top 8)</h5>
+                    <h5 class="fw-bold mb-0">Últimas Transacciones</h5>
                     <button class="btn btn-sm btn-light text-primary"
                         onclick="switchView('history', document.querySelectorAll('.nav-link')[1])">Ver Todas</button>
                 </div>
@@ -521,64 +478,55 @@
                                 <th class="text-end">Monto</th>
                             </tr>
                         </thead>
-                        <tbody><!-- JS Inject --></tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- VISTA HISTORIAL (NUEVA) -->
+        <!-- VISTA HISTORIAL -->
         <div id="view-history" class="view-section d-none">
             <div class="card-custom">
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                    <h5 class="fw-bold mb-0">Registro Completo de Movimientos</h5>
-                    <div class="badge bg-light text-secondary border">Mostrando <span id="history-showing">0</span>
-                        registros</div>
+                    <h5 class="fw-bold mb-0">Registro Completo</h5>
+                    <div class="badge bg-light text-secondary border">Total: <span id="history-showing">0</span></div>
                 </div>
-
                 <div class="table-responsive mb-3">
                     <table class="table table-hover align-middle" id="history-table">
                         <thead class="bg-light">
                             <tr>
                                 <th>Fecha</th>
-                                <th>Referencia / Concepto</th>
-                                <th>Categoría (Auto)</th>
+                                <th>Concepto</th>
+                                <th>Categoría</th>
                                 <th>Cuenta</th>
                                 <th>Tipo</th>
                                 <th class="text-end">Monto</th>
                             </tr>
                         </thead>
-                        <tbody id="history-tbody">
-                            <!-- JS Injected -->
-                        </tbody>
+                        <tbody id="history-tbody"></tbody>
                     </table>
                 </div>
-
-                <!-- Footer Paginación -->
                 <div class="d-flex justify-content-between align-items-center border-top pt-3 flex-wrap gap-3">
                     <span class="text-secondary small" id="page-info">Página 1 de 1</span>
                     <div class="d-flex gap-2">
-                        <button class="pagination-btn" id="btn-prev" onclick="changePage(-1)" disabled>
-                            <i class="bi bi-chevron-left"></i> Anterior
-                        </button>
-                        <button class="pagination-btn" id="btn-next" onclick="changePage(1)" disabled>
-                            Siguiente <i class="bi bi-chevron-right"></i>
-                        </button>
+                        <button class="pagination-btn" id="btn-prev" onclick="changePage(-1)" disabled><i
+                                class="bi bi-chevron-left"></i> Anterior</button>
+                        <button class="pagination-btn" id="btn-next" onclick="changePage(1)" disabled>Siguiente <i
+                                class="bi bi-chevron-right"></i></button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- VISTA ANALÍTICA AVANZADA -->
+        <!-- VISTA ANALYTICS -->
         <div id="view-analytics" class="view-section d-none">
             <div class="row g-4 mb-4">
                 <div class="col-md-6">
                     <div class="card-custom bg-dark text-white"
                         style="background: linear-gradient(135deg, #1f2937 0%, #111827 100%);">
                         <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="bg-white bg-opacity-10 p-2 rounded-circle">
-                                <i class="bi bi-graph-up-arrow text-warning"></i>
-                            </div>
+                            <div class="bg-white bg-opacity-10 p-2 rounded-circle"><i
+                                    class="bi bi-graph-up-arrow text-warning"></i></div>
                             <h6 class="mb-0 opacity-75">Proyección Fin de Mes</h6>
                         </div>
                         <h2 class="fw-bold mb-1" id="projection-amount">$0.00</h2>
@@ -587,7 +535,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="card-custom">
-                        <h6 class="text-secondary text-uppercase small fw-bold mb-2">Promedio Diario (Gasto)</h6>
+                        <h6 class="text-secondary text-uppercase small fw-bold mb-2">Promedio Diario</h6>
                         <h2 class="fw-bold text-dark mb-1" id="avg-daily">$0.00</h2>
                         <div class="progress mt-3" style="height: 6px;">
                             <div class="progress-bar bg-primary" role="progressbar" style="width: 70%"></div>
@@ -599,396 +547,290 @@
                 <div class="col-12">
                     <div class="card-custom">
                         <h5 class="fw-bold mb-4">Análisis por Método de Pago</h5>
-                        <div style="height: 300px;">
-                            <canvas id="chart-accounts"></canvas>
-                        </div>
+                        <div style="height: 300px;"><canvas id="chart-accounts"></canvas></div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 
     <script>
         // ==========================================
-        // CONFIGURACIÓN
+        // CONFIGURACIÓN Y COLORES
         // ==========================================
         const API_URL = "https://purple-mud-12f8.karlosmontoya091.workers.dev/";
 
-        const categoryRules = [
-            { cat: "Comida", keys: ["tacos", "pizza", "burger", "restaurante", "sushi", "rappi", "uber eats", "alitas", "cena", "desayuno", "comida"] },
-            { cat: "Café", keys: ["starbucks", "cafe", "café", "andatti", "caffenio", "tim hortons", "dunkin"] },
-            { cat: "Supermercado", keys: ["heb", "walmart", "soriana", "costco", "oxxo", "super", "bodega", "fresko", "tienda", "oxxo"] },
-            { cat: "Transporte", keys: ["uber", "didi", "taxi", "gasolina", "pemex", "bp", "shell", "camion", "transporte", "metro"] },
-            { cat: "Servicios", keys: ["cfe", "luz", "agua", "internet", "telcel", "att", "plan", "netflix", "spotify", "youtube", "hbo", "disney"] },
-            { cat: "Salud", keys: ["farmacia", "doctor", "dentista", "hospital", "medicina", "consulta"] },
-            { cat: "Shopping", keys: ["amazon", "mercado libre", "zara", "ropa", "shein", "temu", "nike", "adidas"] },
-            { cat: "Suscripciones", keys: ["apple", "google", "icloud"] }
-        ];
+        // Mapa de colores EXACTO para tus categorías de Notion
+        const categoryColors = {
+            "Alimentación (Despensa/Súper)": "#ef4444", // Rojo
+            "Restaurantes (Comida fuera)": "#8b5cf6",   // Morado
+            "Transporte (Gasolina/Uber/Didi)": "#3b82f6", // Azul
+            "Servicios del Hogar (Utilities)": "#64748b", // Gris Azulado
+            "Entretenimiento y Suscripciones": "#eab308", // Amarillo
+            "Salud y Cuidado Persona": "#10b981",       // Verde
+            "Compras y Vestimenta": "#f97316",          // Naranja
+            "Vivienda (Renta/Hipoteca)": "#475569",     // Gris Oscuro
+            "Educación o Cuidado de Niños": "#a855f7",  // Morado Claro
+            "Ahorro e Inversión": "#ec4899",            // Rosa
+            "Otros (Varios)": "#94a3b8"                 // Gris Default
+        };
+
+        const getCategoryColor = (catName) => {
+            return categoryColors[catName] || "#94a3b8";
+        };
 
         // ==========================================
         // LÓGICA PRINCIPAL
         // ==========================================
         const { DateTime } = luxon;
         let allTransactions = [];
-        let filteredGlobal = []; // Para uso en historial
+        let filteredGlobal = [];
         let charts = {};
-
-        // Paginación
         let currentPage = 1;
         const itemsPerPage = 20;
 
         function switchView(viewName, element) {
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
-
-            ['dashboard', 'history', 'analytics'].forEach(v => {
-                document.getElementById(`view-${v}`).classList.add('d-none');
-            });
+            ['dashboard', 'history', 'analytics'].forEach(v => document.getElementById(`view-${v}`).classList.add('d-none'));
             document.getElementById(`view-${viewName}`).classList.remove('d-none');
-
-            // Si vamos al historial, forzamos render de la tabla
-            if (viewName === 'history') {
-                renderHistoryTable();
-            }
+            if (viewName === 'history') renderHistoryTable();
         }
 
-        const formatMoney = (amount) => {
-            return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
-        };
-
-        const detectCategory = (name) => {
-            const lowerName = name.toLowerCase();
-            for (const rule of categoryRules) {
-                if (rule.keys.some(key => lowerName.includes(key))) {
-                    return rule.cat;
-                }
-            }
-            return "Otros";
-        };
+        const formatMoney = (amount) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
 
         async function loadData() {
             const loader = document.getElementById('loading-overlay');
-            loader.style.opacity = '1';
-            loader.style.display = 'flex';
+            loader.style.opacity = '1'; loader.style.display = 'flex';
 
             try {
-                let data;
+                let data = [];
                 if (API_URL) {
                     const response = await fetch(API_URL);
                     if (!response.ok) throw new Error("Error API");
                     data = await response.json();
-                } else {
-                    data = [];
                 }
 
                 allTransactions = data.map(tx => ({
                     ...tx,
-                    categoriaAuto: detectCategory(tx.nombre)
-                }));
-
-                // Ordenar por fecha descendente por defecto
-                allTransactions.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+                    // IMPORTANTE: Ahora tomamos la categoría directo del Worker (tx.categoria)
+                    // Si viene vacía o nula, usamos "Otros (Varios)"
+                    categoria: tx.categoria || "Otros (Varios)"
+                })).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
                 updateDashboard();
 
             } catch (error) {
                 console.error(error);
-                alert("Error conectando con tu Notion. Verifica la API.");
+                alert("Error conectando con Notion. Revisa que hayas actualizado tu Worker.");
             } finally {
-                setTimeout(() => {
-                    loader.style.opacity = '0';
-                    setTimeout(() => loader.style.display = 'none', 500);
-                }, 800);
+                setTimeout(() => { loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 500); }, 800);
             }
         }
 
-        function calculateTrends(currentMonthTotal, previousMonthTotal, elementId) {
-            const el = document.getElementById(elementId);
-            if (previousMonthTotal === 0) {
-                el.innerText = "+100%";
-                return;
-            }
-            const diff = currentMonthTotal - previousMonthTotal;
-            const percentage = (diff / previousMonthTotal) * 100;
-            const symbol = percentage > 0 ? "+" : "";
-            el.innerText = `${symbol}${percentage.toFixed(1)}%`;
-        }
-
-        function calculateProjection(currentExpense) {
-            const now = DateTime.now();
-            const daysInMonth = now.daysInMonth;
-            const currentDay = now.day;
-            if (currentDay === 0) return 0;
-            const dailyAvg = currentExpense / currentDay;
-            const projected = dailyAvg * daysInMonth;
-            document.getElementById('avg-daily').innerText = formatMoney(dailyAvg);
-            document.getElementById('projection-amount').innerText = formatMoney(projected);
-        }
-
-        // ==========================================
-        // LÓGICA DE FILTRADO Y DASHBOARD
-        // ==========================================
         function getFilteredTransactions() {
             const range = document.getElementById('time-range').value;
             const now = DateTime.now();
-
             return allTransactions.filter(tx => {
                 const txDate = DateTime.fromISO(tx.fecha);
                 if (range === 'today') return txDate.hasSame(now, 'day');
                 if (range === 'week') return txDate.hasSame(now, 'week');
                 if (range === 'month') return txDate.hasSame(now, 'month');
                 if (range === 'year') return txDate.hasSame(now, 'year');
-                if (range === 'all') return true;
                 return true;
             });
         }
 
         function updateDashboard() {
             const filtered = getFilteredTransactions();
-            filteredGlobal = filtered; // Guardar referencia para historial
-
-            // Reiniciar paginación al cambiar filtros
+            filteredGlobal = filtered;
             currentPage = 1;
 
-            // --- Cálculos Dashboard ---
             const now = DateTime.now();
-
-            // Comparativa Mes vs Mes Anterior (Independiente del filtro visual)
             const currentMonthTxs = allTransactions.filter(tx => DateTime.fromISO(tx.fecha).hasSame(now, 'month'));
             const prevMonthTxs = allTransactions.filter(tx => DateTime.fromISO(tx.fecha).hasSame(now.minus({ months: 1 }), 'month'));
 
-            let totalExpense = 0;
-            let totalIncome = 0;
-
+            let totalExpense = 0, totalIncome = 0;
             filtered.forEach(tx => {
                 if (tx.tipo.toLowerCase().includes('ingreso')) totalIncome += tx.valor;
                 else totalExpense += tx.valor;
             });
 
-            let curMonthExp = 0, curMonthInc = 0;
-            let prevMonthExp = 0, prevMonthInc = 0;
-
-            currentMonthTxs.forEach(t => t.tipo.toLowerCase().includes('ingreso') ? curMonthInc += t.valor : curMonthExp += t.valor);
-            prevMonthTxs.forEach(t => t.tipo.toLowerCase().includes('ingreso') ? prevMonthInc += t.valor : prevMonthExp += t.valor);
-
+            // KPIs
             document.getElementById('kpi-expense').innerText = formatMoney(totalExpense);
             document.getElementById('kpi-income').innerText = formatMoney(totalIncome);
             document.getElementById('kpi-balance').innerText = formatMoney(totalIncome - totalExpense);
             document.getElementById('kpi-count').innerText = filtered.length;
 
+            // Trends
+            let curMonthExp = 0, prevMonthExp = 0, curMonthInc = 0, prevMonthInc = 0;
+            currentMonthTxs.forEach(t => t.tipo.toLowerCase().includes('ingreso') ? curMonthInc += t.valor : curMonthExp += t.valor);
+            prevMonthTxs.forEach(t => t.tipo.toLowerCase().includes('ingreso') ? prevMonthInc += t.valor : prevMonthExp += t.valor);
+
             calculateTrends(curMonthExp, prevMonthExp, 'trend-expense');
             calculateTrends(curMonthInc, prevMonthInc, 'trend-income');
 
             // Proyecciones
-            const range = document.getElementById('time-range').value;
-            if (range === 'month') {
-                calculateProjection(totalExpense);
-            } else {
-                document.getElementById('projection-amount').innerText = "Ver vista Mensual";
-                document.getElementById('avg-daily').innerText = "—";
-            }
+            if (document.getElementById('time-range').value === 'month') calculateProjection(totalExpense);
+            else { document.getElementById('projection-amount').innerText = "Ver vista Mensual"; document.getElementById('avg-daily').innerText = "—"; }
 
-            // Agrupaciones
+            // Agrupaciones para Gráficos
             const categoryGroups = {};
             const accountGroups = {};
             filtered.filter(t => !t.tipo.toLowerCase().includes('ingreso')).forEach(tx => {
-                categoryGroups[tx.categoriaAuto] = (categoryGroups[tx.categoriaAuto] || 0) + tx.valor;
+                categoryGroups[tx.categoria] = (categoryGroups[tx.categoria] || 0) + tx.valor;
                 accountGroups[tx.cuenta] = (accountGroups[tx.cuenta] || 0) + tx.valor;
             });
 
             renderCharts(categoryGroups, accountGroups);
             renderTopAccounts(accountGroups);
-            renderDashboardTable(filtered); // Tabla pequeña del dashboard
-            renderHistoryTable(); // Tabla grande del historial (si está visible se actualiza)
+            renderDashboardTable(filtered);
+            renderHistoryTable();
         }
 
-        // ==========================================
-        // RENDERIZADO
-        // ==========================================
+        function calculateTrends(curr, prev, elId) {
+            const el = document.getElementById(elId);
+            if (prev === 0) { el.innerText = "+100%"; return; }
+            const diff = ((curr - prev) / prev) * 100;
+            el.innerText = (diff > 0 ? "+" : "") + diff.toFixed(1) + "%";
+        }
 
-        // Tabla Dashboard (Top 8)
+        function calculateProjection(expense) {
+            const now = DateTime.now();
+            if (now.day === 0) return;
+            const daily = expense / now.day;
+            document.getElementById('avg-daily').innerText = formatMoney(daily);
+            document.getElementById('projection-amount').innerText = formatMoney(daily * now.daysInMonth);
+        }
+
+        // ================= Renderizado =================
+
         function renderDashboardTable(txs) {
             const tbody = document.querySelector('#tx-table tbody');
             tbody.innerHTML = '';
-            // No necesitamos ordenar de nuevo, allTransactions ya está ordenado
-            const recent = txs.slice(0, 8);
+            txs.slice(0, 8).forEach(tx => {
+                const isInc = tx.tipo.toLowerCase().includes('ingreso');
+                const color = getCategoryColor(tx.categoria);
+                const shortCat = tx.categoria.split('(')[0]; // Solo muestra "Alimentación" no "(Despensa...)"
 
-            recent.forEach(tx => {
-                const isIncome = tx.tipo.toLowerCase().includes('ingreso');
-                const row = `
+                tbody.innerHTML += `
                     <tr>
-                        <td class="text-secondary small">${tx.fecha}</td>
+                        <td class="text-secondary small">${DateTime.fromISO(tx.fecha).toFormat('dd MMM')}</td>
                         <td class="fw-bold text-dark">${tx.nombre}</td>
-                        <td><span class="badge bg-light text-secondary border border-light">${tx.categoriaAuto}</span></td>
-                        <td class="small text-secondary"><i class="bi bi-credit-card me-1"></i> ${tx.cuenta}</td>
-                        <td class="text-end fw-bold ${isIncome ? 'text-success' : 'text-danger'}">
-                            ${isIncome ? '+' : '-'} ${formatMoney(tx.valor)}
+                        <td><span class="badge-cat" style="background:${color}20; color:${color}">${shortCat}</span></td>
+                        <td class="small text-secondary">${tx.cuenta}</td>
+                        <td class="text-end fw-bold ${isInc ? 'text-success' : 'text-danger'}">
+                            ${isInc ? '+' : '-'} ${formatMoney(tx.valor)}
                         </td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
+                    </tr>`;
             });
         }
 
-        // Tabla Historial (Paginada)
         function renderHistoryTable() {
             const tbody = document.getElementById('history-tbody');
             tbody.innerHTML = '';
-
-            const totalItems = filteredGlobal.length;
-            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
-
-            // Validar página actual
+            const total = filteredGlobal.length;
+            const pages = Math.ceil(total / itemsPerPage) || 1;
             if (currentPage < 1) currentPage = 1;
-            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage > pages) currentPage = pages;
 
-            // Slice de datos
-            const start = (currentPage - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const pageItems = filteredGlobal.slice(start, end);
+            const slice = filteredGlobal.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-            // Render Rows
-            if (pageItems.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-muted">No hay registros en este periodo</td></tr>';
+            if (slice.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-muted">Sin registros</td></tr>';
             } else {
-                pageItems.forEach(tx => {
-                    const isIncome = tx.tipo.toLowerCase().includes('ingreso');
-                    const badgeClass = isIncome ? 'bg-soft-green' : 'bg-soft-red';
-
-                    const row = `
+                slice.forEach(tx => {
+                    const isInc = tx.tipo.toLowerCase().includes('ingreso');
+                    tbody.innerHTML += `
                         <tr>
                             <td class="text-secondary small" style="white-space:nowrap;">${tx.fecha}</td>
                             <td class="fw-bold text-dark">${tx.nombre}</td>
-                            <td><span class="badge bg-light text-secondary border">${tx.categoriaAuto}</span></td>
-                            <td class="small text-secondary"><i class="bi bi-credit-card me-1"></i> ${tx.cuenta}</td>
-                             <td><span class="badge ${isIncome ? 'bg-soft-green' : 'bg-soft-red'} bg-opacity-10 text-dark border-0">${tx.tipo}</span></td>
-                            <td class="text-end fw-bold ${isIncome ? 'text-success' : 'text-danger'}">
-                                ${isIncome ? '+' : '-'} ${formatMoney(tx.valor)}
+                            <td>${tx.categoria}</td>
+                            <td>${tx.cuenta}</td>
+                            <td><span class="badge ${isInc ? 'bg-soft-green' : 'bg-soft-red'} bg-opacity-10 text-dark border-0">${tx.tipo}</span></td>
+                            <td class="text-end fw-bold ${isInc ? 'text-success' : 'text-danger'}">
+                                ${formatMoney(tx.valor)}
                             </td>
-                        </tr>
-                    `;
-                    tbody.innerHTML += row;
+                        </tr>`;
                 });
             }
 
-            // Actualizar Controles Paginación
-            document.getElementById('history-showing').innerText = totalItems;
-            document.getElementById('page-info').innerText = `Página ${currentPage} de ${totalPages}`;
+            document.getElementById('history-showing').innerText = total;
+            document.getElementById('page-info').innerText = `Página ${currentPage} de ${pages}`;
             document.getElementById('btn-prev').disabled = currentPage === 1;
-            document.getElementById('btn-next').disabled = currentPage === totalPages;
+            document.getElementById('btn-next').disabled = currentPage === pages;
         }
 
-        function changePage(delta) {
-            currentPage += delta;
-            renderHistoryTable();
-            // Scroll suave al inicio de la tabla
-            document.getElementById('view-history').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        function changePage(delta) { currentPage += delta; renderHistoryTable(); document.getElementById('view-history').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 
-        function renderTopAccounts(accData) {
+        function renderTopAccounts(accs) {
             const list = document.getElementById('account-list');
             list.innerHTML = '';
-            const sorted = Object.entries(accData).sort((a, b) => b[1] - a[1]).slice(0, 4);
-            const total = Object.values(accData).reduce((a, b) => a + b, 0);
+            const sorted = Object.entries(accs).sort((a, b) => b[1] - a[1]).slice(0, 4);
+            const total = Object.values(accs).reduce((a, b) => a + b, 0);
 
-            const colors = ['bg-soft-blue', 'bg-soft-red', 'bg-soft-green', 'bg-soft-gray'];
-            const iconColors = ['text-primary', 'text-danger', 'text-success', 'text-secondary'];
+            if (sorted.length === 0) { list.innerHTML = '<div class="text-center text-muted small">Sin gastos</div>'; return; }
 
-            if (sorted.length === 0) {
-                list.innerHTML = '<div class="text-center text-muted small">Sin gastos registrados</div>';
-                return;
-            }
+            const styles = [
+                { bg: 'bg-soft-blue', txt: 'text-primary' }, { bg: 'bg-soft-red', txt: 'text-danger' },
+                { bg: 'bg-soft-green', txt: 'text-success' }, { bg: 'bg-soft-gray', txt: 'text-secondary' }
+            ];
 
-            sorted.forEach((item, index) => {
-                const percent = total > 0 ? Math.round((item[1] / total) * 100) : 0;
-                const colorClass = colors[index % colors.length];
-                const textClass = iconColors[index % iconColors.length];
-
+            sorted.forEach(([name, val], i) => {
+                const st = styles[i % styles.length];
+                const pct = total > 0 ? Math.round((val / total) * 100) : 0;
                 list.innerHTML += `
                     <div class="d-flex align-items-center justify-content-between">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="rounded-3 p-2 ${colorClass}">
-                                <i class="bi bi-credit-card-2-front ${textClass}"></i>
-                            </div>
-                            <div>
-                                <div class="fw-bold small text-dark">${item[0]}</div>
-                                <div class="text-secondary" style="font-size: 0.7rem;">${percent}% del gasto</div>
-                            </div>
+                            <div class="rounded-3 p-2 ${st.bg}"><i class="bi bi-credit-card-2-front ${st.txt}"></i></div>
+                            <div><div class="fw-bold small text-dark">${name}</div><div class="text-secondary" style="font-size: 0.7rem;">${pct}% del gasto</div></div>
                         </div>
-                        <div class="fw-bold text-dark small">${formatMoney(item[1])}</div>
-                    </div>
-                `;
+                        <div class="fw-bold text-dark small">${formatMoney(val)}</div>
+                    </div>`;
             });
         }
 
         function renderCharts(catData, accData) {
             const catCtx = document.getElementById('chart-categories').getContext('2d');
             if (charts.cat) charts.cat.destroy();
-            const palette = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5', '#9B59B6'];
+
+            // Usamos los colores definidos en categoryColors
+            const labels = Object.keys(catData);
+            const data = Object.values(catData);
+            const bgColors = labels.map(l => getCategoryColor(l));
 
             charts.cat = new Chart(catCtx, {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(catData),
-                    datasets: [{
-                        label: 'Gasto',
-                        data: Object.values(catData),
-                        backgroundColor: palette,
-                        borderRadius: 6,
-                        barThickness: 20
-                    }]
+                    labels: labels,
+                    datasets: [{ label: 'Gasto', data: data, backgroundColor: bgColors, borderRadius: 6, barThickness: 20 }]
                 },
                 options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { display: false } },
-                        y: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', weight: '600' } } }
-                    }
+                    scales: { x: { display: false }, y: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', weight: '600' } } } }
                 }
             });
 
             const accCtx = document.getElementById('chart-accounts').getContext('2d');
             if (charts.acc) charts.acc.destroy();
-
             charts.acc = new Chart(accCtx, {
                 type: 'line',
                 data: {
                     labels: Object.keys(accData),
                     datasets: [{
-                        label: 'Flujo por Cuenta',
-                        data: Object.values(accData),
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderColor: '#3b82f6',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#3b82f6',
-                        pointBorderWidth: 2
+                        label: 'Flujo', data: Object.values(accData),
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)', borderColor: '#3b82f6', borderWidth: 3, fill: true, tension: 0.4,
+                        pointRadius: 4, pointBackgroundColor: '#fff', pointBorderColor: '#3b82f6', pointBorderWidth: 2
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { grid: { borderDash: [5, 5], color: '#f3f4f6' } },
-                        x: { grid: { display: false } }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { borderDash: [5, 5], color: '#f3f4f6' } } } }
             });
         }
 
         document.getElementById('time-range').addEventListener('change', updateDashboard);
         loadData();
-
     </script>
-
 </body>
 
 </html>
